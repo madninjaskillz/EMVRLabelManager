@@ -1,0 +1,150 @@
+﻿<Window x:Class="GameScannerplusplus.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GameScannerplusplus"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="1300" Width="1354">
+    <Window.Resources>
+        <DataTemplate x:Key="DataTemplate1">
+            <Grid Margin="0,1" Background="#FFB4B4B4" Width="400">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.ColumnSpan="3" Text="{Binding Title}"></TextBlock>
+                    <StackPanel Grid.Row="1">
+                        <TextBlock Text="{Binding System}"></TextBlock>
+                        <TextBlock Text="{Binding EmuMoviesSystem}"></TextBlock>
+                    </StackPanel>
+
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Code}"></TextBlock>
+                    <Image Grid.Row="1" Grid.Column="2" Source="{Binding CartUrl}" Height="64"></Image>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="DataTemplate2">
+            <StackPanel Orientation="Horizontal">
+                <CheckBox IsChecked="{Binding HasConfig}" IsEnabled="False"></CheckBox>
+                <TextBlock Text="{Binding Name}"></TextBlock>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="DataTemplate3">
+            <Grid>
+                <TextBox Text="{Binding Mode=OneWay}" Width="280"></TextBox>
+            </Grid>
+        </DataTemplate>
+    </Window.Resources>
+    <Window.DataContext>
+        <local:MainViewModel/>
+    </Window.DataContext>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="340"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="440"/>
+        </Grid.ColumnDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="3*"/>
+            </Grid.RowDefinitions>
+            <ScrollViewer>
+                <ListView ItemsSource="{Binding FoundSystems}" Width="300" ItemTemplate="{DynamicResource DataTemplate2}" SelectionChanged="ListView_SelectionChanged"></ListView>
+            </ScrollViewer>
+            <ScrollViewer Grid.Row="1" >
+                <StackPanel DataContext="{Binding SelectedSystem}">
+
+                    <Label Margin="20,0">EmoMovies System Name</Label>
+                    <TextBox Margin="20,0,20,0" Text="{Binding EmuMoviesSystem, Mode=TwoWay}" TextChanged="TextBox_TextChanged"></TextBox>
+
+                    <Label Margin="20,0">Folders</Label>
+                    <ListBox Margin="20,0" Height="100" ItemsSource="{Binding FolderNames}" ItemTemplate="{DynamicResource DataTemplate3}"></ListBox>
+
+                    <Label Margin="20,0">Cart Image Size: (X,Y)</Label>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Margin="20,0,20,0" Text="{Binding ImageWidth}" TextChanged="TextBox_TextChanged"></TextBox>
+                        <TextBox Grid.Column="1" Margin="20,0,20,0" Text="{Binding ImageHeight}" TextChanged="TextBox_TextChanged"></TextBox>
+                    </Grid>
+
+                    <Label Margin="20,0">Label Position:</Label>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Margin="20,0,20,0" Text="{Binding LabelSize.X, Mode=TwoWay}" TextChanged="TextBox_TextChanged"></TextBox>
+                        <TextBox Grid.Column="1" Margin="20,0,20,0" Text="{Binding LabelSize.Y, Mode=TwoWay}" TextChanged="TextBox_TextChanged"></TextBox>
+                    </Grid>
+
+                    <Label Margin="20,0">Cart Image Size: (X,Y)</Label>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Margin="20,0,20,0" Text="{Binding LabelSize.Width, Mode=TwoWay}" TextChanged="TextBox_TextChanged"></TextBox>
+                        <TextBox Grid.Column="1" Margin="20,0,20,0" Text="{Binding LabelSize.Height, Mode=TwoWay}" TextChanged="TextBox_TextChanged"></TextBox>
+                    </Grid>
+
+                    <Label Margin="20,0">Template Image</Label>
+                    <TextBox Margin="20,0,20,0" Text="{Binding Template}" TextChanged="TextBox_TextChanged"></TextBox>
+
+                    <Label Margin="20,0">Position On Template: (X,Y)</Label>
+                    <Grid Margin="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Margin="20,0,20,0" Text="{Binding TemplateLabelSize.X}" TextChanged="TextBox_TextChanged"></TextBox>
+                        <TextBox Grid.Column="1" Margin="20,0,20,0" Text="{Binding TemplateLabelSize.y}" TextChanged="TextBox_TextChanged"></TextBox>
+                    </Grid>
+
+                    <Label Margin="20,0">Label on Template Size</Label>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Margin="20,0,20,20" Text="{Binding TemplateLabelSize.Width}" TextChanged="TextBox_TextChanged"></TextBox>
+                        <TextBox Grid.Column="1" Margin="20,0,20,20" Text="{Binding TemplateLabelSize.Height}" TextChanged="TextBox_TextChanged"></TextBox>
+                    </Grid>
+
+                    <Button Margin="20" Click="SaveConsoleConfigClicked">Save</Button>
+
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+
+
+        <StackPanel Grid.Column="1">
+
+            <Label Margin="20,0">Label Size</Label>
+            <TextBox Margin="20,0,20,20" Text="{Binding GameScannerPath, Mode=TwoWay}" TextChanged="TextBox_TextChanged"></TextBox>
+
+            <Label Margin="20,0">EmuMovies UserName</Label>
+            <TextBox Margin="20,0,20,20" Text="{Binding UserName, Mode=TwoWay}" TextChanged="TextBox_TextChanged"></TextBox>
+
+            <Label Margin="20,0">EmuMovies Password</Label>
+            <TextBox Margin="20,0,20,20" Text="{Binding PassWord, Mode=TwoWay}" TextChanged="TextBox_TextChanged"></TextBox>
+            <TextBox Margin="20,5" Height="228" AcceptsReturn="True" Text="{Binding Log}" TextChanged="TextBox_TextChanged_1"></TextBox>
+            <Button Margin="20,5" Click="Button_Click4">Clear Games</Button>
+            <Button Margin="20,5" Click="Button_Click" IsEnabled="{Binding ButtonsEnabled}">Scan Games</Button>
+            <Button Margin="20,5" Click="Button_Click3"  IsEnabled="{Binding ButtonsEnabled}">Download Carts</Button>
+            <Button Margin="20,5" Click="Button_Click2" >Convert Carts</Button>
+        </StackPanel>
+        <ListView Grid.Column="2" ItemsSource="{Binding Titles}" ItemTemplate="{DynamicResource DataTemplate1}" Width="400" HorizontalAlignment="Right"/>
+    </Grid>
+</Window>

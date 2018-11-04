@@ -131,7 +131,7 @@
 
         <StackPanel Grid.Column="1">
 
-            <Label Margin="20,0">Label Size</Label>
+            <Label Margin="20,0">Emu VR Path (ensure trailing slash)</Label>
             <TextBox Margin="20,0,20,20" Text="{Binding GameScannerPath, Mode=TwoWay}" TextChanged="TextBox_TextChanged"></TextBox>
 
             <Label Margin="20,0">EmuMovies UserName</Label>

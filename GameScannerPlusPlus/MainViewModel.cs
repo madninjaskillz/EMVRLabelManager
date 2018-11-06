@@ -17,20 +17,28 @@ namespace GameScannerplusplus
 {
     public class MainViewModel : BaseViewModel
     {
-        
+
         private string dbName = "db5.txt";
         public MainViewModel()
         {
             try
             {
                 string json = File.ReadAllText(dbName);
-                Titles = new ObservableCollection<TitleModel>(JsonConvert.DeserializeObject<List<TitleModel>>(json));
+                var _titles = new ObservableCollection<TitleModel>(JsonConvert.DeserializeObject<List<TitleModel>>(json));
+                foreach (var title in Titles.Where(t =>
+                    string.IsNullOrWhiteSpace(t.CartImage) && !string.IsNullOrWhiteSpace(t.CartUrl)))
+                {
+                    title.CartImage = title.CartUrl;
+                }
+
+                Titles = _titles;
+
             }
             catch
             {
             }
 
-            try
+            if (File.Exists("config.json"))
             {
                 string configJson = File.ReadAllText("config.json");
                 Config config = JsonConvert.DeserializeObject<Config>(configJson);
@@ -39,24 +47,40 @@ namespace GameScannerplusplus
                 UserName = config.UserName;
                 PassWord = config.Password;
             }
-            catch
-            {
-            }
 
-            try
+            string scc = File.ReadAllText("systems.cfg");
+            SystemConfigs = new ObservableCollection<ConsoleLabelConfig>(JsonConvert.DeserializeObject<List<ConsoleLabelConfig>>(scc));
+            foreach (ConsoleLabelConfig consoleLabelConfig in SystemConfigs)
             {
-                SystemConfigs = new ObservableCollection<ConsoleLabelConfig>(JsonConvert.DeserializeObject<List<ConsoleLabelConfig>>(File.ReadAllText("systems.cfg")));
-                foreach (ConsoleLabelConfig consoleLabelConfig in SystemConfigs)
+
+                FoundSystems.Add(new System
                 {
-
-                    FoundSystems.Add(new System
-                    {
-                        HasConfig = true,
-                        Name = consoleLabelConfig.FolderNames.First(),
-                    });
-                }
+                    HasConfig = true,
+                    Name = consoleLabelConfig.EmuVRMedia,
+                });
             }
-            catch { }
+        }
+
+        private int loadingThingsToDo = 0;
+        private int loadingThingsDone = 0;
+        private bool loadingVisible = false;
+
+        public int LoadingThingsDone
+        {
+            get => loadingThingsDone;
+            set => Set(ref loadingThingsDone, value);
+        }
+
+        public int LoadingThingsToDo
+        {
+            get => loadingThingsToDo;
+            set => Set(ref loadingThingsToDo, value);
+        }
+
+        public bool LoadingVisible
+        {
+            get => loadingVisible;
+            set => Set(ref loadingVisible, value);
         }
 
         public void SaveConfig()
@@ -136,8 +160,6 @@ namespace GameScannerplusplus
             set => Set(ref titles, value);
         }
 
-        public Dictionary<string, ConsoleLabelConfig> ConsoleConfigs = new Dictionary<string, ConsoleLabelConfig>();
-
         private ObservableCollection<System> foundSystems = new ObservableCollection<System>();
 
         public ObservableCollection<System> FoundSystems
@@ -153,19 +175,19 @@ namespace GameScannerplusplus
             public bool HasConfig { get; set; }
         }
 
-        public ObservableCollection<ConsoleLabelConfig> SystemConfigs= new ObservableCollection<ConsoleLabelConfig>();
+        public ObservableCollection<ConsoleLabelConfig> SystemConfigs = new ObservableCollection<ConsoleLabelConfig>();
         public ConsoleLabelConfig GetConfig(string system)
         {
-            if (SystemConfigs.Any(x => x.FolderNames.Any(y => y.ToLower() == system.ToLower())))
-            {
-                var config = SystemConfigs.First(x=>x.FolderNames.Any(y=>y.ToLower()==system.ToLower()));
+            var config = SystemConfigs.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x.EmuVRMedia) && x.EmuVRMedia.ToLower() == system.ToLower());
 
+            if (config != null)
+            {
                 if (!FoundSystems.Any(x => x.Name.ToLower() == system.ToLower()))
                 {
                     FoundSystems.Add(new System
                     {
                         HasConfig = true,
-                        Name = system,
+                        Name = system.ToLower(),
                     });
                 }
 
@@ -175,7 +197,7 @@ namespace GameScannerplusplus
             {
                 var cfg = new ConsoleLabelConfig
                 {
-                    FolderNames = new List<string> {system},
+                    //FolderNames = new List<string> { system },
 
                 };
 
@@ -191,52 +213,6 @@ namespace GameScannerplusplus
 
                 throw new NotSupportedException();
             }
-
-            
-
-            if (!ConsoleConfigs.ContainsKey(system.ToLower()))
-            {
-                if (File.Exists(system + ".txt"))
-                {
-                    string txt = File.ReadAllText(system + ".txt");
-                    ConsoleLabelConfig cfg = JsonConvert.DeserializeObject<ConsoleLabelConfig>(txt);
-                    ConsoleConfigs.Add(system.ToLower(), cfg);
-
-                    FoundSystems.Add(new System
-                    {
-                        HasConfig = true,
-                        Name = system,
-                    });
-
-                    cfg.FolderNames.Add(system);
-
-                    SystemConfigs.Add(cfg);
-
-                    string scjson = JsonConvert.SerializeObject(SystemConfigs);
-                    File.WriteAllText("systems.cfg",scjson);
-                }
-                else
-                {
-                    if (!FoundSystems.Any(x => x.Name.ToLower() == system.ToLower()))
-                    {
-                        FoundSystems.Add(new System
-                        {
-                            HasConfig = false,
-                            Name = system
-                        });
-
-                        ConsoleConfigs.Add(system.ToLower(), new ConsoleLabelConfig()
-                        {
-                            EmuMoviesSystem = system
-                            
-                        });
-                    }
-
-                    throw new NotSupportedException();
-                }
-            }
-
-            return ConsoleConfigs[system.ToLower()];
         }
 
         private string log = "";
@@ -254,19 +230,20 @@ namespace GameScannerplusplus
 
         public async Task ScanFile()
         {
+            LoadingVisible = true;
             string playlist = File.ReadAllText(GameScannerPath + "Game Scanner\\emuvr_playlist.txt");
 
             List<string> lines = playlist.Split('\r').Select(x => x.Replace("\n", "")).ToList();
 
             int line = 0;
 
-
+            LoadingThingsToDo = lines.Count;
             while (line < lines.Count)
             {
                 TitleModel model = new TitleModel();
 
                 model.Path = lines[line];
-                model.System = model.Path.Split('\\')[1];
+                model.System = MapFolderToMedia(model.Path.Split('\\')[1]);
 
                 line++;
 
@@ -290,6 +267,8 @@ namespace GameScannerplusplus
                 catch
                 {
                 }
+
+                LoadingThingsDone = line;
             }
 
             Debug.WriteLine(Titles);
@@ -298,6 +277,9 @@ namespace GameScannerplusplus
 
             int mx = Titles.Count(t => string.IsNullOrWhiteSpace(t.CartUrl));
             int ct = 0;
+            LoadingThingsDone = 0;
+            LoadingThingsToDo = Titles.Where(t => string.IsNullOrWhiteSpace(t.CartUrl)).Count();
+
             foreach (TitleModel titleModel in Titles.Where(t => string.IsNullOrWhiteSpace(t.CartUrl)))
             {
                 ct++;
@@ -310,33 +292,37 @@ namespace GameScannerplusplus
                 if (result.Count > 0)
                 {
                     titleModel.CartUrl = result.First();
+                    titleModel.CartImage = titleModel.CartUrl;
                 }
+
+                LoadingThingsDone = ct;
             }
+
+            Titles = Titles;
 
             string json = JsonConvert.SerializeObject(Titles.ToList());
             File.WriteAllText(dbName, json);
 
-
+            LoadingVisible = false;
         }
 
-        public async void DownloadCartImages()
+        public async Task DownloadCartImages()
         {
             int ct = 0;
+            LoadingThingsToDo = Titles.Where(t => !string.IsNullOrWhiteSpace(t.CartUrl)).Count();
+            LoadingVisible = true;
             DebugLog("Carts to download: " + Titles.Where(t => !string.IsNullOrWhiteSpace(t.CartUrl)).Count());
             foreach (TitleModel titleModel in Titles.Where(t => !string.IsNullOrWhiteSpace(t.CartUrl)))
             {
+                await Task.Delay(1);
                 ct++;
+                LoadingThingsDone = ct;
                 DebugLog("Downloading " + ct + "/" + Titles.Where(t => !string.IsNullOrWhiteSpace(t.CartUrl)).Count());
                 string filename = titleModel.Path.Split('\\').Last().Split('#').First();
                 string extension = filename.Split('.').Last();
                 string imageExtension = titleModel.CartUrl.Split('.').Last();
 
-                string imagePath = GameScannerPath + "Custom\\Labels\\" + titleModel.System + "\\" +
-                                   filename.Substring(0, filename.Length - extension.Length) + imageExtension;
-
-                string imagePathUnmodified = GameScannerPath + "Custom\\Carts\\" + titleModel.System + "\\" +
-                                             filename.Substring(0, filename.Length - extension.Length) + imageExtension;
-
+                string imagePathUnmodified = GameScannerPath + "Custom\\Carts\\" + titleModel.System + "\\" + filename.Substring(0, filename.Length - extension.Length) + imageExtension;
 
                 DebugLog("Downloading " + titleModel.Title);
                 try
@@ -348,6 +334,7 @@ namespace GameScannerplusplus
 
 
                         test.Save(imagePathUnmodified);
+                        titleModel.CartImage = imagePathUnmodified;
                     }
                 }
                 catch
@@ -355,6 +342,8 @@ namespace GameScannerplusplus
                 }
 
             }
+
+            LoadingVisible = false;
         }
 
         public async Task<Bitmap> DownloadAndAutoCrop(string url, string system)
@@ -389,13 +378,16 @@ namespace GameScannerplusplus
         }
 
 
-        public void ConvertCarts()
+        public async Task ConvertCarts()
         {
+            LoadingVisible = true;
+            LoadingThingsToDo = Titles.Where(t => !string.IsNullOrWhiteSpace(t.CartUrl)).Count();
             int ct = 0;
             DebugLog(Titles.Where(t => !string.IsNullOrWhiteSpace(t.CartUrl)).Count() + " to convert");
             foreach (TitleModel titleModel in Titles.Where(t => !string.IsNullOrWhiteSpace(t.CartUrl)))
             {
                 ct++;
+                LoadingThingsDone = ct;
                 DebugLog("Convertering " + ct + "/" + Titles.Where(t => !string.IsNullOrWhiteSpace(t.CartUrl)).Count());
                 string filename = titleModel.Path.Split('\\').Last().Split('#').First();
                 string extension = filename.Split('.').Last();
@@ -424,7 +416,7 @@ namespace GameScannerplusplus
                         {
                             Bitmap template = new Bitmap(cfg.Template);
                             Graphics g = Graphics.FromImage(template);
-                            g.DrawImage(cropped,new PointF[]
+                            g.DrawImage(cropped, new PointF[]
                             {
                                 new PointF(cfg.TemplateLabelSize.X,cfg.TemplateLabelSize.Y),
                                 new PointF(cfg.TemplateLabelSize.X+cfg.TemplateLabelSize.Width,cfg.TemplateLabelSize.Y),
@@ -432,7 +424,7 @@ namespace GameScannerplusplus
                                 new PointF(cfg.TemplateLabelSize.X,cfg.TemplateLabelSize.Y+cfg.TemplateLabelSize.Height)
                             });
 
-                           // g.Save();
+                            // g.Save();
                             template.Save(imagePath);
                         }
                         else
@@ -444,24 +436,47 @@ namespace GameScannerplusplus
                     {
                         Debug.WriteLine(e.Message);
                     }
+
+                    await Task.Delay(1);
                 }
             }
+
+            LoadingVisible = false;
         }
 
         public Rectangle GetRectangleForSystem(string system, int width, int height)
         {
-
             ConsoleLabelConfig cfg = GetConfig(system);
 
             float wRatio = width / (float)cfg.ImageWidth;
             float hRatio = height / (float)cfg.ImageHeight;
 
             return new Rectangle((int)((float)cfg.LabelSize.X * wRatio), (int)((float)cfg.LabelSize.Y * hRatio), (int)((float)cfg.LabelSize.Width * wRatio), (int)((float)cfg.LabelSize.Height * hRatio));
+        }
 
+        private Dictionary<string, string> folderMediaMap = new Dictionary<string, string>();
+        public string MapFolderToMedia(string folder)
+        {
+            if (folderMediaMap.ContainsKey(folder.ToLower()))
+            {
+                return folderMediaMap[folder.ToLower()];
+            }
+            else
+            {
+                string cfgPath = GameScannerPath + "Games\\" + folder + "\\emuvr_core.txt";
 
+                if (File.Exists(cfgPath))
+                {
+                    string contents = File.ReadAllText(cfgPath);
+                    string[] lines = contents.Split('\r');
+                    string mediaLine = lines.FirstOrDefault(t => t.StartsWith("media"));
+                    var res = mediaLine.Split('\"')[1];
+                    folderMediaMap.Add(folder.ToLower(), res);
+                    return res;
+                }
 
-            throw new NotSupportedException();
-
+                return "Unknown";
+            }
         }
 
         public class ConsoleLabelConfig
@@ -475,14 +490,15 @@ namespace GameScannerplusplus
             public string Template { get; set; }
 
             public string EmuMoviesSystem { get; set; }
-            public List<string> FolderNames { get; set; } = new List<string>();
+            public string EmuVRMedia { get; set; }
+            //  public List<string> FolderNames { get; set; } = new List<string>();
         }
 
         public class LabelSize : BaseViewModel
         {
             private int x, y, width, height;
 
-            public int X { get=>x; set=>Set(ref x,value); }
+            public int X { get => x; set => Set(ref x, value); }
             public int Y { get => y; set => Set(ref y, value); }
             public int Width { get => width; set => Set(ref width, value); }
             public int Height { get => height; set => Set(ref height, value); }
@@ -495,7 +511,7 @@ namespace GameScannerplusplus
 
         public void SetSelectedSystem(object selectedItem)
         {
-            System system = (System) selectedItem;
+            System system = (System)selectedItem;
 
             SelectedSystem = GetConfig(system.Name);
 
@@ -512,6 +528,9 @@ namespace GameScannerplusplus
             get => selectedSystem;
             set => Set(ref selectedSystem, value);
         }
+
+        private string currentTab = "games";
+        public string CurrentTab { get => currentTab; set => Set(ref currentTab, value); }
 
         public void SaveConsoleConfig()
         {

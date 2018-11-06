@@ -5,40 +5,46 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GameScannerplusplus"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1300" Width="1354">
+        Title="MainWindow" Height="1314" Width="2203.5">
     <Window.Resources>
+        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <local:StringToConsoleImagePathConverter x:Key="StringToConsoleImagePathConverter"/>
+        <local:ValueMatchesStringToBrushConverter x:Key="ValueMatchesStringToBrushConverter"/>
+        <local:ValueMatchesStringToVisibilityConverter x:Key="ValueMatchesStringToVisibilityConverter"/>
         <DataTemplate x:Key="DataTemplate1">
-            <Grid Margin="0,1" Background="#FFB4B4B4" Width="400">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition/>
-                        <ColumnDefinition Width="3*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <TextBlock Grid.ColumnSpan="3" Text="{Binding Title}"></TextBlock>
-                    <StackPanel Grid.Row="1">
-                        <TextBlock Text="{Binding System}"></TextBlock>
-                        <TextBlock Text="{Binding EmuMoviesSystem}"></TextBlock>
-                    </StackPanel>
 
-                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Code}"></TextBlock>
-                    <Image Grid.Row="1" Grid.Column="2" Source="{Binding CartUrl}" Height="64"></Image>
+            <StackPanel Orientation="Horizontal" Margin="0,1" Width="Auto">
+                <Grid Height="100" Width="100">
+                    <Image Source="{Binding System, Converter={StaticResource StringToConsoleImagePathConverter}}" Height="90"/>
                 </Grid>
-            </Grid>
+                <Grid Height="100" Width="180">
+                    <Image Source="{Binding CartUrl}" Height="90"/>
+                </Grid>
+
+
+                <StackPanel>
+                    <TextBlock Text="{Binding Title}" FontSize="24" Foreground="White"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding System}" Foreground="White"/>
+                        <TextBlock Text="{Binding EmuMoviesSystem}" Foreground="White" Margin="20,0"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Code}" Foreground="White"/>
+                        <TextBlock Text="{Binding CartUrl}" Foreground="White"  Margin="20,0"/>
+                    </StackPanel>
+                </StackPanel>
+
+            </StackPanel>
         </DataTemplate>
         <DataTemplate x:Key="DataTemplate2">
             <StackPanel Orientation="Horizontal">
-                <CheckBox IsChecked="{Binding HasConfig}" IsEnabled="False"></CheckBox>
-                <TextBlock Text="{Binding Name}"></TextBlock>
+                <CheckBox IsChecked="{Binding HasConfig}" IsEnabled="False"/>
+                <TextBlock Text="{Binding Name}" Foreground="White" />
             </StackPanel>
         </DataTemplate>
         <DataTemplate x:Key="DataTemplate3">
             <Grid>
-                <TextBox Text="{Binding Mode=OneWay}" Width="280"></TextBox>
+                <TextBox Text="{Binding Mode=OneWay}" Width="280"/>
             </Grid>
         </DataTemplate>
     </Window.Resources>
@@ -46,105 +52,173 @@
         <local:MainViewModel/>
     </Window.DataContext>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="340"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="440"/>
-        </Grid.ColumnDefinitions>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="2*"/>
-                <RowDefinition Height="3*"/>
-            </Grid.RowDefinitions>
-            <ScrollViewer>
-                <ListView ItemsSource="{Binding FoundSystems}" Width="300" ItemTemplate="{DynamicResource DataTemplate2}" SelectionChanged="ListView_SelectionChanged"></ListView>
-            </ScrollViewer>
-            <ScrollViewer Grid.Row="1" >
-                <StackPanel DataContext="{Binding SelectedSystem}">
+        <Grid.Background>
+            
+            <ImageBrush ImageSource="evr_labelmanager.png" TileMode="Tile" ViewportUnits="Absolute" Viewport="0,0,384,216"/>
 
-                    <Label Margin="20,0">EmoMovies System Name</Label>
-                    <TextBox Margin="20,0,20,0" Text="{Binding EmuMoviesSystem, Mode=TwoWay}" TextChanged="TextBox_TextChanged"></TextBox>
+        </Grid.Background>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="100"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" Grid.Column="0">
+            <Image Source="logo.png" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,10" />
 
-                    <Label Margin="20,0">Folders</Label>
-                    <ListBox Margin="20,0" Height="100" ItemsSource="{Binding FolderNames}" ItemTemplate="{DynamicResource DataTemplate3}"></ListBox>
-
-                    <Label Margin="20,0">Cart Image Size: (X,Y)</Label>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Margin="20,0,20,0" Text="{Binding ImageWidth}" TextChanged="TextBox_TextChanged"></TextBox>
-                        <TextBox Grid.Column="1" Margin="20,0,20,0" Text="{Binding ImageHeight}" TextChanged="TextBox_TextChanged"></TextBox>
-                    </Grid>
-
-                    <Label Margin="20,0">Label Position:</Label>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Margin="20,0,20,0" Text="{Binding LabelSize.X, Mode=TwoWay}" TextChanged="TextBox_TextChanged"></TextBox>
-                        <TextBox Grid.Column="1" Margin="20,0,20,0" Text="{Binding LabelSize.Y, Mode=TwoWay}" TextChanged="TextBox_TextChanged"></TextBox>
-                    </Grid>
-
-                    <Label Margin="20,0">Cart Image Size: (X,Y)</Label>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Margin="20,0,20,0" Text="{Binding LabelSize.Width, Mode=TwoWay}" TextChanged="TextBox_TextChanged"></TextBox>
-                        <TextBox Grid.Column="1" Margin="20,0,20,0" Text="{Binding LabelSize.Height, Mode=TwoWay}" TextChanged="TextBox_TextChanged"></TextBox>
-                    </Grid>
-
-                    <Label Margin="20,0">Template Image</Label>
-                    <TextBox Margin="20,0,20,0" Text="{Binding Template}" TextChanged="TextBox_TextChanged"></TextBox>
-
-                    <Label Margin="20,0">Position On Template: (X,Y)</Label>
-                    <Grid Margin="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Margin="20,0,20,0" Text="{Binding TemplateLabelSize.X}" TextChanged="TextBox_TextChanged"></TextBox>
-                        <TextBox Grid.Column="1" Margin="20,0,20,0" Text="{Binding TemplateLabelSize.y}" TextChanged="TextBox_TextChanged"></TextBox>
-                    </Grid>
-
-                    <Label Margin="20,0">Label on Template Size</Label>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Margin="20,0,20,20" Text="{Binding TemplateLabelSize.Width}" TextChanged="TextBox_TextChanged"></TextBox>
-                        <TextBox Grid.Column="1" Margin="20,0,20,20" Text="{Binding TemplateLabelSize.Height}" TextChanged="TextBox_TextChanged"></TextBox>
-                    </Grid>
-
-                    <Button Margin="20" Click="SaveConsoleConfigClicked">Save</Button>
-
-                </StackPanel>
-            </ScrollViewer>
         </Grid>
+       
+
+        
+
+        <Grid Grid.Row="1"  >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal">
+                <Button Background="{x:Null}" BorderBrush="{x:Null}" Click="Button_Click_1"><TextBlock FontSize="36" FontWeight="Light" Foreground="{Binding CurrentTab, ConverterParameter=games, Converter={StaticResource ValueMatchesStringToBrushConverter}}" Margin="10,0">games</TextBlock></Button>
+                <Button Background="{x:Null}" BorderBrush="{x:Null}" Click="Button_Click_2"><TextBlock FontSize="36" FontWeight="Light" Foreground="{Binding CurrentTab, ConverterParameter=config, Converter={StaticResource ValueMatchesStringToBrushConverter}}" Margin="10,0">config</TextBlock></Button>
+                <Button Background="{x:Null}" BorderBrush="{x:Null}" Click="Button_Click_4"><TextBlock FontSize="36" FontWeight="Light" Foreground="{Binding CurrentTab, ConverterParameter=systems, Converter={StaticResource ValueMatchesStringToBrushConverter}}" Margin="10,0">systems</TextBlock></Button>
+                <Button Background="{x:Null}" BorderBrush="{x:Null}" Click="Button_Click_3"><TextBlock FontSize="36" FontWeight="Light" Foreground="{Binding CurrentTab, ConverterParameter=log, Converter={StaticResource ValueMatchesStringToBrushConverter}}" Margin="10,0">log</TextBlock></Button>
+            </StackPanel>
+            <ListView Grid.Row="1" ItemsSource="{Binding Titles}" ItemTemplate="{DynamicResource DataTemplate1}" Background="#00FFFFFF" Visibility="{Binding CurrentTab, ConverterParameter=games, Converter={StaticResource ValueMatchesStringToVisibilityConverter}}"/>
+            <StackPanel Grid.Row="1" Visibility="{Binding CurrentTab, ConverterParameter=config, Converter={StaticResource ValueMatchesStringToVisibilityConverter}}" >
+
+                <Label Margin="20,0"  Foreground="White" FontSize="18" FontFamily="Segoe UI" FontWeight="Light" Content="Emu VR Path (ensure trailing slash)"/>
+                <TextBox Margin="20,0,20,20" Text="{Binding GameScannerPath, Mode=TwoWay}" TextChanged="TextBox_TextChanged" FontSize="18"/>
+
+                <Label  Foreground="White" FontSize="18" FontFamily="Segoe UI" FontWeight="Light" Margin="20,0" Content="EmuMovies UserName"/>
+                <TextBox Margin="20,0,20,20" Text="{Binding UserName, Mode=TwoWay}" TextChanged="TextBox_TextChanged" FontSize="18"/>
+
+                <Label  Foreground="White" FontSize="18" FontFamily="Segoe UI" FontWeight="Light" Margin="20,0" Content="EmuMovies Password"/>
+                <TextBox Margin="20,0,20,20" Text="{Binding PassWord, Mode=TwoWay}" TextChanged="TextBox_TextChanged" FontSize="18"/>
+
+                
+
+            </StackPanel>
+            <Grid Grid.Row="1" Visibility="{Binding CurrentTab, ConverterParameter=log, Converter={StaticResource ValueMatchesStringToVisibilityConverter}}">
+                <TextBox Margin="20,5" AcceptsReturn="True" Text="{Binding Log}" TextChanged="TextBox_TextChanged_1" FontSize="18" VerticalScrollBarVisibility="Auto"/>
+            </Grid>
+
+            <Grid Grid.Row="1" Height="Auto"  Visibility="{Binding CurrentTab, ConverterParameter=systems, Converter={StaticResource ValueMatchesStringToVisibilityConverter}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid>
+                    <ScrollViewer Height="Auto">
+                        <ListView ItemsSource="{Binding FoundSystems}" Width="300" ItemTemplate="{DynamicResource DataTemplate2}" SelectionChanged="ListView_SelectionChanged" Background="{x:Null}" Margin="0,10"/>
+                    </ScrollViewer>
+                </Grid>
+                <ScrollViewer Grid.Column="1" >
+                    <StackPanel DataContext="{Binding SelectedSystem}">
+
+                        <Label Margin="20,0,20,0" Foreground="White" FontSize="18" FontFamily="Segoe UI" FontWeight="Light" Content="EmuMovies System Name"/>
+                        <TextBox Margin="20,0,20,0" Text="{Binding EmuMoviesSystem, Mode=TwoWay}" TextChanged="TextBox_TextChanged" FontSize="18"/>
+
+                        <Label Margin="20,0" Foreground="White" FontSize="18" FontFamily="Segoe UI" FontWeight="Light" Content="Folders"/>
+                        <ListBox Margin="20,0" Height="100" ItemsSource="{Binding FolderNames}" ItemTemplate="{DynamicResource DataTemplate3}"/>
+
+                        <Label Margin="20,0" Foreground="White" FontSize="18" FontFamily="Segoe UI" FontWeight="Light" Content="Cart Image Size: (X,Y)"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Margin="20,0,20,0" Text="{Binding ImageWidth}" TextChanged="TextBox_TextChanged" FontSize="18"/>
+                            <TextBox Grid.Column="1" Margin="20,0,20,0" Text="{Binding ImageHeight}" TextChanged="TextBox_TextChanged" FontSize="18"/>
+                        </Grid>
+
+                        <Label Margin="20,0" Foreground="White" FontSize="18" FontFamily="Segoe UI" FontWeight="Light" Content="Label Position:"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Margin="20,0,20,0" Text="{Binding LabelSize.X, Mode=TwoWay}" TextChanged="TextBox_TextChanged" FontSize="18"/>
+                            <TextBox Grid.Column="1" Margin="20,0,20,0" Text="{Binding LabelSize.Y, Mode=TwoWay}" TextChanged="TextBox_TextChanged" FontSize="18"/>
+                        </Grid>
+
+                        <Label Margin="20,0" Foreground="White" FontSize="18" FontFamily="Segoe UI" FontWeight="Light" Content="Cart Image Size: (X,Y)"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Margin="20,0,20,0" Text="{Binding LabelSize.Width, Mode=TwoWay}" TextChanged="TextBox_TextChanged" FontSize="18"/>
+                            <TextBox Grid.Column="1" Margin="20,0,20,0" Text="{Binding LabelSize.Height, Mode=TwoWay}" TextChanged="TextBox_TextChanged" FontSize="18"/>
+                        </Grid>
+
+                        <Label Margin="20,0" Foreground="White" FontSize="18" FontFamily="Segoe UI" FontWeight="Light" Content="Template Image"/>
+                        <TextBox Margin="20,0,20,0" Text="{Binding Template}" TextChanged="TextBox_TextChanged" FontSize="18"/>
+
+                        <Label Margin="20,0" Foreground="White" FontSize="18" FontFamily="Segoe UI" FontWeight="Light" Content="Position On Template: (X,Y)"/>
+                        <Grid Margin="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Margin="20,0,20,0" Text="{Binding TemplateLabelSize.X}" TextChanged="TextBox_TextChanged" FontSize="18"/>
+                            <TextBox Grid.Column="1" Margin="20,0,20,0" Text="{Binding TemplateLabelSize.y}" TextChanged="TextBox_TextChanged" FontSize="18"/>
+                        </Grid>
+
+                        <Label Margin="20,0" Foreground="White" FontSize="18" FontFamily="Segoe UI" FontWeight="Light" Content="Label on Template Size"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Margin="20,0,20,20" Text="{Binding TemplateLabelSize.Width}" TextChanged="TextBox_TextChanged" FontSize="18"/>
+                            <TextBox Grid.Column="1" Margin="20,0,20,20" Text="{Binding TemplateLabelSize.Height}" TextChanged="TextBox_TextChanged" FontSize="18"/>
+                        </Grid>
+
+                        <Button Margin="20" Click="SaveConsoleConfigClicked" Content="Save"  FontSize="18"/>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+
+        </Grid>
+        <Grid Grid.ColumnSpan="3" Grid.Row="2" Background="#7FFFFFFF">
+            <StackPanel Orientation="Horizontal"  HorizontalAlignment="Right" >
+                <Button Margin="20,5" Click="Button_Click4" BorderBrush="{x:Null}" Padding="0" VerticalContentAlignment="Top" HorizontalContentAlignment="Center" Width="100">
+                    <StackPanel>
+                        <TextBlock FontFamily="Segoe UI Symbol" Text="&#xE10A;" FontSize="48" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="0" Margin="0,0,0,0"></TextBlock>
+                        <TextBlock FontFamily="Segoe UI">Clear Games</TextBlock>
+                    </StackPanel>
+                </Button>
+
+                <Button Margin="20,5" Click="Button_Click" IsEnabled="{Binding ButtonsEnabled}" BorderBrush="{x:Null}" Padding="0" VerticalContentAlignment="Top" HorizontalContentAlignment="Center" Width="100">
+                    <StackPanel>
+                        <TextBlock FontFamily="Segoe UI Symbol" Text="&#xE11A;" FontSize="48" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="0" Margin="0,0,0,0"></TextBlock>
+                        <TextBlock FontFamily="Segoe UI">Scan Games</TextBlock>
+                    </StackPanel>
+                </Button>
 
 
+                <Button Margin="20,5" Click="Button_Click3" IsEnabled="{Binding ButtonsEnabled}" BorderBrush="{x:Null}" Padding="0" VerticalContentAlignment="Top" HorizontalContentAlignment="Center" Width="100">
+                    <StackPanel>
+                        <TextBlock FontFamily="Segoe UI Symbol" Text="&#xE118;" FontSize="48" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="0" Margin="0,0,0,0"></TextBlock>
+                        <TextBlock FontFamily="Segoe UI">Download Carts</TextBlock>
+                    </StackPanel>
+                </Button>
 
-        <StackPanel Grid.Column="1">
+                <Button Margin="20,5" Click="Button_Click2" BorderBrush="{x:Null}" Padding="0" VerticalContentAlignment="Top" HorizontalContentAlignment="Center" Width="100">
+                    <StackPanel>
+                        <TextBlock FontFamily="Segoe UI Symbol" Text="&#xE123;" FontSize="48" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="0" Margin="0,0,0,0"></TextBlock>
+                        <TextBlock FontFamily="Segoe UI">Convert Carts</TextBlock>
+                    </StackPanel>
+                </Button>
 
-            <Label Margin="20,0">Emu VR Path (ensure trailing slash)</Label>
-            <TextBox Margin="20,0,20,20" Text="{Binding GameScannerPath, Mode=TwoWay}" TextChanged="TextBox_TextChanged"></TextBox>
-
-            <Label Margin="20,0">EmuMovies UserName</Label>
-            <TextBox Margin="20,0,20,20" Text="{Binding UserName, Mode=TwoWay}" TextChanged="TextBox_TextChanged"></TextBox>
-
-            <Label Margin="20,0">EmuMovies Password</Label>
-            <TextBox Margin="20,0,20,20" Text="{Binding PassWord, Mode=TwoWay}" TextChanged="TextBox_TextChanged"></TextBox>
-            <TextBox Margin="20,5" Height="228" AcceptsReturn="True" Text="{Binding Log}" TextChanged="TextBox_TextChanged_1"></TextBox>
-            <Button Margin="20,5" Click="Button_Click4">Clear Games</Button>
-            <Button Margin="20,5" Click="Button_Click" IsEnabled="{Binding ButtonsEnabled}">Scan Games</Button>
-            <Button Margin="20,5" Click="Button_Click3"  IsEnabled="{Binding ButtonsEnabled}">Download Carts</Button>
-            <Button Margin="20,5" Click="Button_Click2" >Convert Carts</Button>
-        </StackPanel>
-        <ListView Grid.Column="2" ItemsSource="{Binding Titles}" ItemTemplate="{DynamicResource DataTemplate1}" Width="400" HorizontalAlignment="Right"/>
+            </StackPanel>
+        </Grid>
+            <Grid Grid.RowSpan="3" Background="#EF3C3C3C" Visibility="{Binding LoadingVisible, Converter={StaticResource BoolToVisibilityConverter}}" >
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock FontSize="80" HorizontalAlignment="Center">busy...</TextBlock>
+                    <ProgressBar Height="40" Width="900" Margin="20" Maximum="{Binding LoadingThingsToDo}" Value="{Binding LoadingThingsDone}"></ProgressBar>
+                    <TextBox Margin="20,5" AcceptsReturn="True" Text="{Binding Log}" TextChanged="TextBox_TextChanged_1" FontSize="24" VerticalScrollBarVisibility="Auto" Background="{x:Null}" BorderBrush="{x:Null}" SelectionBrush="{x:Null}" Height="259"/>
+            </StackPanel>
+            </Grid>
     </Grid>
 </Window>

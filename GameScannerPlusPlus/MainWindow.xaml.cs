@@ -27,39 +27,39 @@ namespace GameScannerplusplus
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            this.IsEnabled = false;
+           
             MainViewModel vm = this.DataContext as MainViewModel;
             await vm.ScanFile();
          //   MessageBox.Show("Done!");
-            this.IsEnabled = true;
+           
 
         }
 
         private void Button_Click2(object sender, RoutedEventArgs e)
         {
-            this.IsEnabled = false;
+           
             MainViewModel vm = this.DataContext as MainViewModel;
             vm.ConvertCarts();
          //   MessageBox.Show("Done!");
-            this.IsEnabled = true;
+           
         }
 
         private void Button_Click3(object sender, RoutedEventArgs e)
         {
-            this.IsEnabled = false;
+            
             MainViewModel vm = this.DataContext as MainViewModel;
             vm.DownloadCartImages();
          //   MessageBox.Show("Done!");
-            this.IsEnabled = true;
+            
         }
 
         private void Button_Click4(object sender, RoutedEventArgs e)
         {
-            this.IsEnabled = false;
+           
             MainViewModel vm = this.DataContext as MainViewModel;
             vm.ClearGames();
           //  MessageBox.Show("Done!");
-            this.IsEnabled = true;
+           
         }
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -84,6 +84,35 @@ namespace GameScannerplusplus
         {
             MainViewModel vm = this.DataContext as MainViewModel;
             vm.SaveConsoleConfig();
+        }
+
+        private void StackPanel_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            MainViewModel vm = this.DataContext as MainViewModel;
+            vm.CurrentTab = "games";
+        }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            MainViewModel vm = this.DataContext as MainViewModel;
+            vm.CurrentTab = "config";
+        }
+
+        private void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            MainViewModel vm = this.DataContext as MainViewModel;
+            vm.CurrentTab = "log";
+        }
+
+        private void Button_Click_4(object sender, RoutedEventArgs e)
+        {
+            MainViewModel vm = this.DataContext as MainViewModel;
+            vm.CurrentTab = "systems";
         }
     }
 }

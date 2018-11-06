@@ -4,6 +4,8 @@ Third Party Add on for EmuVR to improve on the game scanning.
 ## about:
 EVRLM takes the config from the EmuVR GameScanner and attempts to get more metadata, auto download cart/disc images and auto crop those to provide just the label, allowing you to to see the carts in game fully customized with very little effort.
 
+![screenshot](https://github.com/madninjaskillz/EMVRLabelManager/raw/master/emvlm_ss1.png)
+
 ## requirements:
 * [EmuVR](http://www.emuvr.net/)
 * [EmuMovies Account](https://emumovies.com/)

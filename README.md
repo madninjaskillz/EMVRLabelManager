@@ -1,8 +1,8 @@
-# GameScannerPlusPlus
+# EVR Label Manager
 Third Party Add on for EmuVR to improve on the game scanning.
 
 ## about:
-GSPP takes the config from the EmuVR GameScanner and attempts to get more metadata, auto download cart/disc images and auto crop those to provide just the label, allowing you to to see the carts in game fully customized with very little effort.
+EVRLM takes the config from the EmuVR GameScanner and attempts to get more metadata, auto download cart/disc images and auto crop those to provide just the label, allowing you to to see the carts in game fully customized with very little effort.
 
 ## requirements:
 * [EmuVR](http://www.emuvr.net/)
@@ -37,7 +37,7 @@ This is an array and will support multiple folders. I recommend if your folder d
 
 ### Image Size
 
-GSPP works on the principle that all cart images for a specific system will be the same aspect ratio with the same placement, but may be a different physical size. To make that easier to work with, we specify the size of the image you are working from and will use that as a ratio for any different sized images.
+EVRLM works on the principle that all cart images for a specific system will be the same aspect ratio with the same placement, but may be a different physical size. To make that easier to work with, we specify the size of the image you are working from and will use that as a ratio for any different sized images.
 
 ```javascript
     "ImageWidth": 444.0,
@@ -79,6 +79,3 @@ and to configure it:
 ```
 
 This specifies a rectangle to draw the label - it will be scaled to fit.
-
-
-

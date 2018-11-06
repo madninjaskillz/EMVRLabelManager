@@ -280,17 +280,17 @@ namespace GameScannerplusplus.Providers.EmuMovies
         public async Task<List<string>> FetchImages(TitleModel titleModel)
         {
             List<string> result = await FetchImages(titleModel.Title, titleModel.EmuMoviesSystem, EmuMoviesMediaTypes.Cart);
-            result.AddRange(await FetchImages(titleModel.Title, titleModel.EmuMoviesSystem, EmuMoviesMediaTypes.CD));
-            result.AddRange(await FetchImages(titleModel.Title, titleModel.EmuMoviesSystem, EmuMoviesMediaTypes.Disc));
+            if (result.Count == 0) result.AddRange(await FetchImages(titleModel.Title, titleModel.EmuMoviesSystem, EmuMoviesMediaTypes.CD));
+            if (result.Count == 0) result.AddRange(await FetchImages(titleModel.Title, titleModel.EmuMoviesSystem, EmuMoviesMediaTypes.Disc));
 
-            result.AddRange(await FetchImages(titleModel.Code, titleModel.EmuMoviesSystem, EmuMoviesMediaTypes.Cart));
-            result.AddRange(await FetchImages(titleModel.Code, titleModel.EmuMoviesSystem, EmuMoviesMediaTypes.CD));
-            result.AddRange(await FetchImages(titleModel.Code, titleModel.EmuMoviesSystem, EmuMoviesMediaTypes.Disc));
+            if (result.Count == 0) result.AddRange(await FetchImages(titleModel.Code, titleModel.EmuMoviesSystem, EmuMoviesMediaTypes.Cart));
+            if (result.Count == 0) result.AddRange(await FetchImages(titleModel.Code, titleModel.EmuMoviesSystem, EmuMoviesMediaTypes.CD));
+            if (result.Count == 0) result.AddRange(await FetchImages(titleModel.Code, titleModel.EmuMoviesSystem, EmuMoviesMediaTypes.Disc));
 
             return result;
         }
 
-        public async Task<List<string>> FetchImages(string search,string system, EmuMoviesMediaTypes mediaType)
+        public async Task<List<string>> FetchImages(string search, string system, EmuMoviesMediaTypes mediaType)
         {
             var _httpClient = new HttpClient();
 

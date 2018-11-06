@@ -39,7 +39,10 @@
         <DataTemplate x:Key="DataTemplate2">
             <StackPanel Orientation="Horizontal">
                 <CheckBox IsChecked="{Binding HasConfig}" IsEnabled="False"/>
-                <TextBlock Text="{Binding Name}" Foreground="White" />
+                <Grid Width="60">
+                <Image Source="{Binding Name, Converter={StaticResource StringToConsoleImagePathConverter}}" Height="45" VerticalAlignment="Center"/>
+                </Grid>
+                <TextBlock Text="{Binding Name}" Foreground="White" FontSize="24" FontWeight="Light" VerticalAlignment="Center" Margin="0,0,0,0" />
             </StackPanel>
         </DataTemplate>
         <DataTemplate x:Key="DataTemplate3">
@@ -83,7 +86,7 @@
                 <Button Background="{x:Null}" BorderBrush="{x:Null}" Click="Button_Click_3"><TextBlock FontSize="36" FontWeight="Light" Foreground="{Binding CurrentTab, ConverterParameter=log, Converter={StaticResource ValueMatchesStringToBrushConverter}}" Margin="10,0">log</TextBlock></Button>
             </StackPanel>
             <ListView Grid.Row="1" ItemsSource="{Binding Titles}" ItemTemplate="{DynamicResource DataTemplate1}" Background="#00FFFFFF" Visibility="{Binding CurrentTab, ConverterParameter=games, Converter={StaticResource ValueMatchesStringToVisibilityConverter}}"/>
-            <StackPanel Grid.Row="1" Visibility="{Binding CurrentTab, ConverterParameter=config, Converter={StaticResource ValueMatchesStringToVisibilityConverter}}" >
+            <StackPanel Grid.Row="1" Visibility="{Binding CurrentTab, ConverterParameter=config, Converter={StaticResource ValueMatchesStringToVisibilityConverter}}" d:IsHidden="True" >
 
                 <Label Margin="20,0"  Foreground="White" FontSize="18" FontFamily="Segoe UI" FontWeight="Light" Content="Emu VR Path (ensure trailing slash)"/>
                 <TextBox Margin="20,0,20,20" Text="{Binding GameScannerPath, Mode=TwoWay}" TextChanged="TextBox_TextChanged" FontSize="18"/>
@@ -97,8 +100,8 @@
                 
 
             </StackPanel>
-            <Grid Grid.Row="1" Visibility="{Binding CurrentTab, ConverterParameter=log, Converter={StaticResource ValueMatchesStringToVisibilityConverter}}">
-                <TextBox Margin="20,5" AcceptsReturn="True" Text="{Binding Log}" TextChanged="TextBox_TextChanged_1" FontSize="18" VerticalScrollBarVisibility="Auto"/>
+            <Grid Grid.Row="1" Visibility="{Binding CurrentTab, ConverterParameter=log, Converter={StaticResource ValueMatchesStringToVisibilityConverter}}" d:IsHidden="True">
+                <TextBox Margin="20,5" AcceptsReturn="True" Text="{Binding Log}" TextChanged="TextBox_TextChanged_1" FontSize="18" VerticalScrollBarVisibility="Auto" d:IsHidden="True"/>
             </Grid>
 
             <Grid Grid.Row="1" Height="Auto"  Visibility="{Binding CurrentTab, ConverterParameter=systems, Converter={StaticResource ValueMatchesStringToVisibilityConverter}}">
@@ -113,12 +116,14 @@
                 </Grid>
                 <ScrollViewer Grid.Column="1" >
                     <StackPanel DataContext="{Binding SelectedSystem}">
-
+<TextBlock FontSize="36" Foreground="White" FontWeight="Light" Margin="20,20,0,0">Media</TextBlock>
                         <Label Margin="20,0,20,0" Foreground="White" FontSize="18" FontFamily="Segoe UI" FontWeight="Light" Content="EmuMovies System Name"/>
                         <TextBox Margin="20,0,20,0" Text="{Binding EmuMoviesSystem, Mode=TwoWay}" TextChanged="TextBox_TextChanged" FontSize="18"/>
 
-                        <Label Margin="20,0" Foreground="White" FontSize="18" FontFamily="Segoe UI" FontWeight="Light" Content="Folders"/>
-                        <ListBox Margin="20,0" Height="100" ItemsSource="{Binding FolderNames}" ItemTemplate="{DynamicResource DataTemplate3}"/>
+                        <Label Margin="20,0,20,0" Foreground="White" FontSize="18" FontFamily="Segoe UI" FontWeight="Light" Content="EmuVR Media Name"/>
+                        <TextBox Margin="20,0,20,0" Text="{Binding EmuVRMedia, Mode=TwoWay}" TextChanged="TextBox_TextChanged" FontSize="18"/>
+
+                        <TextBlock FontSize="36" Foreground="White" FontWeight="Light" Margin="20,20,0,0">Cart Image Properties</TextBlock>
 
                         <Label Margin="20,0" Foreground="White" FontSize="18" FontFamily="Segoe UI" FontWeight="Light" Content="Cart Image Size: (X,Y)"/>
                         <Grid>
@@ -150,6 +155,8 @@
                             <TextBox Grid.Column="1" Margin="20,0,20,0" Text="{Binding LabelSize.Height, Mode=TwoWay}" TextChanged="TextBox_TextChanged" FontSize="18"/>
                         </Grid>
 
+                        <TextBlock FontSize="36" Foreground="White" FontWeight="Light" Margin="20,20,0,0">Custom Template</TextBlock>
+
                         <Label Margin="20,0" Foreground="White" FontSize="18" FontFamily="Segoe UI" FontWeight="Light" Content="Template Image"/>
                         <TextBox Margin="20,0,20,0" Text="{Binding Template}" TextChanged="TextBox_TextChanged" FontSize="18"/>
 
@@ -160,7 +167,7 @@
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
                             <TextBox Margin="20,0,20,0" Text="{Binding TemplateLabelSize.X}" TextChanged="TextBox_TextChanged" FontSize="18"/>
-                            <TextBox Grid.Column="1" Margin="20,0,20,0" Text="{Binding TemplateLabelSize.y}" TextChanged="TextBox_TextChanged" FontSize="18"/>
+                            <TextBox Grid.Column="1" Margin="20,0,20,0" Text="{Binding TemplateLabelSize.Y}" TextChanged="TextBox_TextChanged" FontSize="18"/>
                         </Grid>
 
                         <Label Margin="20,0" Foreground="White" FontSize="18" FontFamily="Segoe UI" FontWeight="Light" Content="Label on Template Size"/>
@@ -173,7 +180,7 @@
                             <TextBox Grid.Column="1" Margin="20,0,20,20" Text="{Binding TemplateLabelSize.Height}" TextChanged="TextBox_TextChanged" FontSize="18"/>
                         </Grid>
 
-                        <Button Margin="20" Click="SaveConsoleConfigClicked" Content="Save"  FontSize="18"/>
+                        <Button Margin="20" Click="SaveConsoleConfigClicked" Content="Save"  FontSize="48" Width="200" HorizontalAlignment="Right"/>
 
                     </StackPanel>
                 </ScrollViewer>
@@ -213,7 +220,7 @@
 
             </StackPanel>
         </Grid>
-            <Grid Grid.RowSpan="3" Background="#EF3C3C3C" Visibility="{Binding LoadingVisible, Converter={StaticResource BoolToVisibilityConverter}}" >
+            <Grid Grid.RowSpan="3" Background="#EF3C3C3C" Visibility="{Binding LoadingVisible, Converter={StaticResource BoolToVisibilityConverter}}" d:IsHidden="True" >
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                     <TextBlock FontSize="80" HorizontalAlignment="Center">busy...</TextBlock>
                     <ProgressBar Height="40" Width="900" Margin="20" Maximum="{Binding LoadingThingsToDo}" Value="{Binding LoadingThingsDone}"></ProgressBar>

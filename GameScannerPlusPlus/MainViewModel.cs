@@ -244,6 +244,7 @@ namespace GameScannerplusplus
 
                 model.Path = lines[line];
                 model.System = MapFolderToMedia(model.Path.Split('\\')[1]);
+                model.Folder = model.Path.Split('\\')[1];
 
                 line++;
 
@@ -322,7 +323,7 @@ namespace GameScannerplusplus
                 string extension = filename.Split('.').Last();
                 string imageExtension = titleModel.CartUrl.Split('.').Last();
 
-                string imagePathUnmodified = GameScannerPath + "Custom\\Carts\\" + titleModel.System + "\\" + filename.Substring(0, filename.Length - extension.Length) + imageExtension;
+                string imagePathUnmodified = GameScannerPath + "Custom\\Carts\\" + titleModel.Folder + "\\" + filename.Substring(0, filename.Length - extension.Length) + imageExtension;
 
                 DebugLog("Downloading " + titleModel.Title);
                 try
@@ -393,10 +394,10 @@ namespace GameScannerplusplus
                 string extension = filename.Split('.').Last();
                 string imageExtension = titleModel.CartUrl.Split('.').Last();
 
-                string imagePath = GameScannerPath + "Custom\\Labels\\" + titleModel.System + "\\" +
+                string imagePath = GameScannerPath + "Custom\\Labels\\" + titleModel.Folder + "\\" +
                                    filename.Substring(0, filename.Length - extension.Length) + imageExtension;
 
-                string imagePathUnmodified = GameScannerPath + "Custom\\Carts\\" + titleModel.System + "\\" +
+                string imagePathUnmodified = GameScannerPath + "Custom\\Carts\\" + titleModel.Folder + "\\" +
                                              filename.Substring(0, filename.Length - extension.Length) + imageExtension;
 
                 if (File.Exists(imagePathUnmodified) && !File.Exists(imagePath))

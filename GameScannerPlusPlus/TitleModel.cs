@@ -16,6 +16,7 @@ namespace GameScannerplusplus
 
         public string CartUrl { get; set; }
         public string CartImage { get; set; }
+        public string Folder { get; set; }
     }
 
 

@@ -1,8 +1,10 @@
-# GameScannerPlusPlus
+# EVR Label Manager
 Third Party Add on for EmuVR to improve on the game scanning.
 
 ## about:
-GSPP takes the config from the EmuVR GameScanner and attempts to get more metadata, auto download cart/disc images and auto crop those to provide just the label, allowing you to to see the carts in game fully customized with very little effort.
+EVRLM takes the config from the EmuVR GameScanner and attempts to get more metadata, auto download cart/disc images and auto crop those to provide just the label, allowing you to to see the carts in game fully customized with very little effort.
+
+![screenshot](https://github.com/madninjaskillz/EMVRLabelManager/raw/master/emvlm_ss1.png)
 
 ## requirements:
 * [EmuVR](http://www.emuvr.net/)
@@ -20,24 +22,32 @@ GSPP takes the config from the EmuVR GameScanner and attempts to get more metada
 In the application folder there is a system.cfg file. This can be edited with the in app properties window (bottom left) however this is currently not complete, so editing the cfg is recommended.
 
 ### System Names
-The two most important properties configure where the games exist on your system and what EmuMovies knows that system as:
+The two most important properties configure EmuVRs media type and what EmuMovies knows that system as:
 
 ```javascript
   "EmuMoviesSystem": "Nintendo_NES",
-      "FolderNames": [
-      "NES"
-    ]
+  "EmuVRMedia": "NES"
 ```
 
 The EmuMoviesSystem property is defined by emu movies - and is used for the cart image search. I have been discovering this with trial and error.
 
-The FolderNames array specifies where your roms are, for instance: If you have a folder for NES titles; "c:\EmuVR\Games\Nintendo NES"
-then you would need an entry in FolderNames as "Nintendo NES".
-This is an array and will support multiple folders. I recommend if your folder doesnt match mine, you add it to the array - and submit a pull request. 
+The EmuVRMedia property is what EmuVR calls this type. It can be found in the games subfolder/emuvr_core.txt, eg
+
+```
+media = "Nintendo 3DS"
+core = "citra_libretro"
+media_type = "Handheld"
+```
+
+would equate to 
+
+```javascript
+  "EmuVRMedia": "Nintendo 3DS"
+```
 
 ### Image Size
 
-GSPP works on the principle that all cart images for a specific system will be the same aspect ratio with the same placement, but may be a different physical size. To make that easier to work with, we specify the size of the image you are working from and will use that as a ratio for any different sized images.
+EVRLM works on the principle that all cart images for a specific system will be the same aspect ratio with the same placement, but may be a different physical size. To make that easier to work with, we specify the size of the image you are working from and will use that as a ratio for any different sized images.
 
 ```javascript
     "ImageWidth": 444.0,
@@ -79,6 +89,3 @@ and to configure it:
 ```
 
 This specifies a rectangle to draw the label - it will be scaled to fit.
-
-
-

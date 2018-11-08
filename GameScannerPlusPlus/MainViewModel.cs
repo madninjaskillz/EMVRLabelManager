@@ -147,7 +147,13 @@ namespace GameScannerplusplus
             get => gameScannerPath;
             set
             {
-                Set(ref gameScannerPath, value);
+                string v = value;
+                if (!string.IsNullOrWhiteSpace(v) && !v.EndsWith("\\"))
+                {
+                    v = v + "\\";
+                }
+
+                Set(ref gameScannerPath, v);
                 CheckButtons();
             }
         }
@@ -514,11 +520,17 @@ namespace GameScannerplusplus
         {
             System system = (System)selectedItem;
 
-            SelectedSystem = GetConfig(system.Name);
-
-            if (SelectedSystem.TemplateLabelSize == null)
+            try
             {
-                SelectedSystem.TemplateLabelSize = new LabelSize();
+                SelectedSystem = GetConfig(system.Name);
+
+                if (SelectedSystem.TemplateLabelSize == null)
+                {
+                    SelectedSystem.TemplateLabelSize = new LabelSize();
+                }
+            }
+            catch
+            {
             }
         }
 

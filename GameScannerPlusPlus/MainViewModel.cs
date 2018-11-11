@@ -323,6 +323,7 @@ namespace GameScannerplusplus
                 LoadingThingsDone = line;
 
                 Titles = new ObservableCollection<TitleModel>(Titles.OrderBy(x => x.System).ThenBy(y => y.Title));
+                UpdateVisibleTitles();
             }
 
             
@@ -356,7 +357,7 @@ namespace GameScannerplusplus
 
             string json = JsonConvert.SerializeObject(Titles.ToList());
             File.WriteAllText(dbName, json);
-
+            UpdateVisibleTitles();
             LoadingVisible = false;
         }
 
@@ -393,6 +394,7 @@ namespace GameScannerplusplus
                 }
             }
 
+            UpdateVisibleTitles();
             LoadingVisible = false;
         }
 
@@ -484,7 +486,7 @@ namespace GameScannerplusplus
                     await Task.Delay(1);
                 }
             }
-
+            UpdateVisibleTitles();
             LoadingVisible = false;
         }
 

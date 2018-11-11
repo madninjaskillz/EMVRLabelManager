@@ -53,6 +53,19 @@ namespace GameScannerplusplus
         }
     }
 
+    public class BoolToOpacityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return ((bool)value) ? 1.0f : 0.25f;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class ValueMatchesStringToBrushConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -70,16 +83,19 @@ namespace GameScannerplusplus
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (value == null)
+            {
+                return null;
+            }
+
             string v = value.ToString().Split('/').First().Trim();
             string root = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
             string pth = "\\ConsoleImages\\" + v.ToString() + ".png";
             
-            var res= root+pth;
+            string res= root+pth;
 
-            Debug.WriteLine("------------------->    "+value.ToString() + ".png");
             return res;
 
-            return new Bitmap(res);
             
         }
 

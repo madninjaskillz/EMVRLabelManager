@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="1314" Width="2203.5">
     <Window.Resources>
+        <local:BoolToOpacityConverter x:Key="BoolToOpacityConverter"/>
         <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <local:StringToConsoleImagePathConverter x:Key="StringToConsoleImagePathConverter"/>
         <local:ValueMatchesStringToBrushConverter x:Key="ValueMatchesStringToBrushConverter"/>
@@ -18,9 +19,20 @@
                     <Image Source="{Binding System, Converter={StaticResource StringToConsoleImagePathConverter}}" Height="90"/>
                 </Grid>
                 <Grid Height="100" Width="180">
-                    <Image Source="{Binding CartUrl}" Height="90"/>
+                    <Button Height="90" Background="{x:Null}" BorderBrush="{x:Null}" Click="ShowCartImage">
+                        <Image Source="{Binding CartImagePath}" Height="90"/>
+                    </Button>
                 </Grid>
-
+                <Grid Height="100" Width="180">
+                    <Button Height="90" Background="{x:Null}" BorderBrush="{x:Null}" Click="ShowLabelImage">
+                        <Image Source="{Binding LabelImagePath}" Height="90"/>
+                    </Button>
+                </Grid>
+                <Grid Height="100" Width="180">
+                    <Button Height="90" Background="{x:Null}" BorderBrush="{x:Null}" Click="ShowCartUrl">
+                        <Image Source="{Binding CartUrl}" Height="90"/>
+                    </Button>
+                </Grid>
 
                 <StackPanel>
                     <TextBlock Text="{Binding Title}" FontSize="24" Foreground="White"/>
@@ -40,7 +52,7 @@
             <StackPanel Orientation="Horizontal">
                 <CheckBox IsChecked="{Binding HasConfig}" IsEnabled="False"/>
                 <Grid Width="60">
-                <Image Source="{Binding Name, Converter={StaticResource StringToConsoleImagePathConverter}}" Height="45" VerticalAlignment="Center"/>
+                    <Image Source="{Binding Name, Converter={StaticResource StringToConsoleImagePathConverter}}" Height="45" VerticalAlignment="Center"/>
                 </Grid>
                 <TextBlock Text="{Binding Name}" Foreground="White" FontSize="24" FontWeight="Light" VerticalAlignment="Center" Margin="0,0,0,0" />
             </StackPanel>
@@ -50,17 +62,45 @@
                 <TextBox Text="{Binding Mode=OneWay}" Width="280"/>
             </Grid>
         </DataTemplate>
+        <ItemsPanelTemplate x:Key="ItemsPanelTemplate1">
+            <VirtualizingStackPanel IsItemsHost="True"/>
+        </ItemsPanelTemplate>
+        <DataTemplate x:Key="DataTemplate4">
+            <Grid>
+                <Button Click="ToggleConsoleVisible" Background="{x:Null}" BorderBrush="{x:Null}" MouseDoubleClick="SetConsole">
+                    <Image Source="{Binding Name, Converter={StaticResource StringToConsoleImagePathConverter}}" Height="80" VerticalAlignment="Center" Opacity="{Binding IsVisible, Converter={StaticResource BoolToOpacityConverter}}" />
+                </Button>
+            </Grid>
+        </DataTemplate>
+        <Style x:Key="ListViewItemStyle1" TargetType="{x:Type ListViewItem}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListViewItem}">
+                        <Grid/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ListViewItemStyle2" TargetType="{x:Type ListViewItem}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListViewItem}">
+                        <StackPanel Orientation="Horizontal"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
     <Window.DataContext>
         <local:MainViewModel/>
     </Window.DataContext>
     <Grid>
         <Grid.Background>
-            
+
             <ImageBrush ImageSource="evr_labelmanager.png" TileMode="Tile" ViewportUnits="Absolute" Viewport="0,0,384,216"/>
 
         </Grid.Background>
-        
+
         <Grid.RowDefinitions>
             <RowDefinition Height="60"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
@@ -70,9 +110,9 @@
             <Image Source="logo.png" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,10" />
 
         </Grid>
-       
 
-        
+
+
 
         <Grid Grid.Row="1"  >
             <Grid.RowDefinitions>
@@ -80,13 +120,21 @@
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <StackPanel Orientation="Horizontal">
-                <Button Background="{x:Null}" BorderBrush="{x:Null}" Click="Button_Click_1"><TextBlock FontSize="36" FontWeight="Light" Foreground="{Binding CurrentTab, ConverterParameter=games, Converter={StaticResource ValueMatchesStringToBrushConverter}}" Margin="10,0">games</TextBlock></Button>
-                <Button Background="{x:Null}" BorderBrush="{x:Null}" Click="Button_Click_2"><TextBlock FontSize="36" FontWeight="Light" Foreground="{Binding CurrentTab, ConverterParameter=config, Converter={StaticResource ValueMatchesStringToBrushConverter}}" Margin="10,0">config</TextBlock></Button>
-                <Button Background="{x:Null}" BorderBrush="{x:Null}" Click="Button_Click_4"><TextBlock FontSize="36" FontWeight="Light" Foreground="{Binding CurrentTab, ConverterParameter=systems, Converter={StaticResource ValueMatchesStringToBrushConverter}}" Margin="10,0">systems</TextBlock></Button>
-                <Button Background="{x:Null}" BorderBrush="{x:Null}" Click="Button_Click_3"><TextBlock FontSize="36" FontWeight="Light" Foreground="{Binding CurrentTab, ConverterParameter=log, Converter={StaticResource ValueMatchesStringToBrushConverter}}" Margin="10,0">log</TextBlock></Button>
+                <Button Background="{x:Null}" BorderBrush="{x:Null}" Click="Button_Click_1">
+                    <TextBlock FontSize="36" FontWeight="Light" Foreground="{Binding CurrentTab, ConverterParameter=games, Converter={StaticResource ValueMatchesStringToBrushConverter}}" Margin="10,0">games</TextBlock>
+                </Button>
+                <Button Background="{x:Null}" BorderBrush="{x:Null}" Click="Button_Click_2">
+                    <TextBlock FontSize="36" FontWeight="Light" Foreground="{Binding CurrentTab, ConverterParameter=config, Converter={StaticResource ValueMatchesStringToBrushConverter}}" Margin="10,0">config</TextBlock>
+                </Button>
+                <Button Background="{x:Null}" BorderBrush="{x:Null}" Click="Button_Click_4">
+                    <TextBlock FontSize="36" FontWeight="Light" Foreground="{Binding CurrentTab, ConverterParameter=systems, Converter={StaticResource ValueMatchesStringToBrushConverter}}" Margin="10,0">systems</TextBlock>
+                </Button>
+                <Button Background="{x:Null}" BorderBrush="{x:Null}" Click="Button_Click_3">
+                    <TextBlock FontSize="36" FontWeight="Light" Foreground="{Binding CurrentTab, ConverterParameter=log, Converter={StaticResource ValueMatchesStringToBrushConverter}}" Margin="10,0">log</TextBlock>
+                </Button>
             </StackPanel>
-            <ListView Grid.Row="1" ItemsSource="{Binding Titles}" ItemTemplate="{DynamicResource DataTemplate1}" Background="#00FFFFFF" Visibility="{Binding CurrentTab, ConverterParameter=games, Converter={StaticResource ValueMatchesStringToVisibilityConverter}}" BorderBrush="{x:Null}" d:IsHidden="True"/>
-            <StackPanel Grid.Row="1" Visibility="{Binding CurrentTab, ConverterParameter=config, Converter={StaticResource ValueMatchesStringToVisibilityConverter}}" >
+            <ListView Grid.Row="1" ItemsSource="{Binding VisibleTitles}" ItemTemplate="{DynamicResource DataTemplate1}" Background="#00FFFFFF" Visibility="{Binding CurrentTab, ConverterParameter=games, Converter={StaticResource ValueMatchesStringToVisibilityConverter}}" BorderBrush="{x:Null}"/>
+            <StackPanel Grid.Row="1" Visibility="{Binding CurrentTab, ConverterParameter=config, Converter={StaticResource ValueMatchesStringToVisibilityConverter}}" d:IsHidden="True" >
 
                 <Label Margin="20,0"  Foreground="White" FontSize="18" FontFamily="Segoe UI" FontWeight="Light" Content="Emu VR Path (ensure trailing slash)"/>
 
@@ -105,7 +153,7 @@
                 <Label  Foreground="White" FontSize="18" FontFamily="Segoe UI" FontWeight="Light" Margin="20,0" Content="EmuMovies Password"/>
                 <TextBox Margin="20,0,20,20" Text="{Binding PassWord, Mode=TwoWay}" TextChanged="TextBox_TextChanged" FontSize="18"/>
 
-                
+
 
             </StackPanel>
             <Grid Grid.Row="1" Visibility="{Binding CurrentTab, ConverterParameter=log, Converter={StaticResource ValueMatchesStringToVisibilityConverter}}" d:IsHidden="True">
@@ -124,7 +172,7 @@
                 </Grid>
                 <ScrollViewer Grid.Column="1" >
                     <StackPanel DataContext="{Binding SelectedSystem}">
-<TextBlock FontSize="36" Foreground="White" FontWeight="Light" Margin="20,20,0,0">Media</TextBlock>
+                        <TextBlock FontSize="36" Foreground="White" FontWeight="Light" Margin="20,20,0,0">Media</TextBlock>
                         <Label Margin="20,0,20,0" Foreground="White" FontSize="18" FontFamily="Segoe UI" FontWeight="Light" Content="EmuMovies System Name"/>
                         <TextBox Margin="20,0,20,0" Text="{Binding EmuMoviesSystem, Mode=TwoWay}" TextChanged="TextBox_TextChanged" FontSize="18"/>
 
@@ -196,7 +244,21 @@
 
         </Grid>
         <Grid Grid.ColumnSpan="3" Grid.Row="2" Background="#7FFFFFFF">
-            <StackPanel Orientation="Horizontal"  HorizontalAlignment="Right" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal" Visibility="{Binding CurrentTab, ConverterParameter=games, Converter={StaticResource ValueMatchesStringToVisibilityConverter}}">
+                <ListView Height="100" ItemsSource="{Binding FoundSystems}" ItemTemplate="{DynamicResource DataTemplate4}" Margin="0,2,0,-2" Background="{x:Null}" BorderBrush="{x:Null}" >
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                </ListView>
+
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal"  HorizontalAlignment="Right" >
                 <Button Margin="20,5" Click="Button_Click4" BorderBrush="{x:Null}" Padding="0" VerticalContentAlignment="Top" HorizontalContentAlignment="Center" Width="100">
                     <StackPanel>
                         <Image Source="clearGames.png" Margin="20,5,20,0" Width="58"></Image>
@@ -228,12 +290,25 @@
 
             </StackPanel>
         </Grid>
-            <Grid Grid.RowSpan="3" Background="#EF3C3C3C" Visibility="{Binding LoadingVisible, Converter={StaticResource BoolToVisibilityConverter}}" d:IsHidden="True" >
-                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <TextBlock FontSize="80" HorizontalAlignment="Center">busy...</TextBlock>
-                    <ProgressBar Height="40" Width="900" Margin="20" Maximum="{Binding LoadingThingsToDo}" Value="{Binding LoadingThingsDone}"></ProgressBar>
-                    <TextBox Margin="20,5" AcceptsReturn="True" Text="{Binding Log}" TextChanged="TextBox_TextChanged_1" FontSize="24" VerticalScrollBarVisibility="Auto" Background="{x:Null}" BorderBrush="{x:Null}" SelectionBrush="{x:Null}" Height="259"/>
+        <Grid Grid.RowSpan="3" Background="#EF3C3C3C" Visibility="{Binding LoadingVisible, Converter={StaticResource BoolToVisibilityConverter}}" d:IsHidden="True" >
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock FontSize="80" HorizontalAlignment="Center">busy...</TextBlock>
+                <ProgressBar Height="40" Width="900" Margin="20" Maximum="{Binding LoadingThingsToDo}" Value="{Binding LoadingThingsDone}"></ProgressBar>
+                <TextBox Margin="20,5" AcceptsReturn="True" Text="{Binding Log}" TextChanged="TextBox_TextChanged_1" FontSize="24" VerticalScrollBarVisibility="Auto" Background="{x:Null}" BorderBrush="{x:Null}" SelectionBrush="{x:Null}" Height="259"/>
             </StackPanel>
+        </Grid>
+        <Grid Grid.ColumnSpan="4" Grid.RowSpan="4" Background="#D3363636" Visibility="{Binding ShowModalImage, Converter={StaticResource BoolToVisibilityConverter}}" d:IsHidden="True" >
+            <Grid Background="Black" Margin="200,50" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Grid Height="30" Background="White" VerticalAlignment="Top">
+                    <TextBlock Text="{Binding ModalImagePath}" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="24"></TextBlock>
+                    <Button Width="30" HorizontalAlignment="Right"  FontFamily="Segoe UI Symbol" Background="{x:Null}" BorderBrush="{x:Null}" FontSize="24" Click="CloseCart">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                    </Button>
+
+                </Grid>
+                <Image Margin="55,85,55,55" Source="{Binding ModalImagePath}"  Stretch="Uniform" />
+
             </Grid>
+        </Grid>
     </Grid>
 </Window>

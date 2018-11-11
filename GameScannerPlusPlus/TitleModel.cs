@@ -16,7 +16,19 @@ namespace GameScannerplusplus
 
         public string CartUrl { get; set; }
         public string CartImage { get; set; }
+        public string CartImagePath { get; set; }
+        public string LabelImagePath { get; set; }
         public string Folder { get; set; }
+    }
+
+    public class TitleMetaData
+    {
+        public string Title { get; set; }
+        public string Publisher { get; set; }
+        public string Developer { get; set; }
+        public int ReleaseYear { get; set; }
+        public string ManualUrl { get; set; }
+        public string MusicUrl { get; set; }
     }
 
 

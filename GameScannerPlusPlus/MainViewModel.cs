@@ -18,13 +18,13 @@ namespace GameScannerplusplus
     public class MainViewModel : BaseViewModel
     {
 
-        private string dbName = "db5.txt";
+        private string dbName = "db6.txt";
         public MainViewModel()
         {
             try
             {
                 string json = File.ReadAllText(dbName);
-                var _titles = new ObservableCollection<TitleModel>(JsonConvert.DeserializeObject<List<TitleModel>>(json));
+                var _titles = new ObservableCollection<TitleModel>(JsonConvert.DeserializeObject<List<TitleModel>>(json).OrderBy(x => x.System).ThenBy(y => y.Title));
                 foreach (var title in Titles.Where(t =>
                     string.IsNullOrWhiteSpace(t.CartImage) && !string.IsNullOrWhiteSpace(t.CartUrl)))
                 {
@@ -59,6 +59,8 @@ namespace GameScannerplusplus
                     Name = consoleLabelConfig.EmuVRMedia,
                 });
             }
+
+            FoundSystems = new ObservableCollection<System>(FoundSystems.OrderBy(x=>x.Name));
         }
 
         private int loadingThingsToDo = 0;
@@ -81,6 +83,21 @@ namespace GameScannerplusplus
         {
             get => loadingVisible;
             set => Set(ref loadingVisible, value);
+        }
+
+        private bool showModalImage;
+        public bool ShowModalImage
+        {
+            get => showModalImage;
+            set => Set(ref showModalImage, value);
+        }
+
+        private string modalImagePath;
+
+        public string ModalImagePath
+        {
+            get => modalImagePath;
+            set => Set(ref modalImagePath, value);
         }
 
         public void SaveConfig()
@@ -163,22 +180,33 @@ namespace GameScannerplusplus
         public ObservableCollection<TitleModel> Titles
         {
             get => titles;
-            set => Set(ref titles, value);
+            set { Set(ref titles, value); }
         }
 
+        public void UpdateVisibleTitles()
+        {
+            this.OnPropertyChanged("VisibleTitles");
+        }
+
+        public ObservableCollection<TitleModel> VisibleTitles => new ObservableCollection<TitleModel>(titles.Where(x=>FoundSystems.First(s=>s.Name.ToLower()==x.System.ToLower()).IsVisible).OrderBy(x=>x.System).ThenBy(t=>t.Title));
+        
         private ObservableCollection<System> foundSystems = new ObservableCollection<System>();
 
         public ObservableCollection<System> FoundSystems
         {
             get => foundSystems;
-            set => Set(ref foundSystems, value);
+            set => Set(ref foundSystems, new ObservableCollection<System>(value.OrderBy(x => x.Name)));
         }
 
 
-        public class System
+
+        public class System : BaseViewModel
         {
+            
             public string Name { get; set; }
             public bool HasConfig { get; set; }
+            private bool isVisible = true;
+            public bool IsVisible { get=>isVisible; set=>Set(ref isVisible, value); }
         }
 
         public ObservableCollection<ConsoleLabelConfig> SystemConfigs = new ObservableCollection<ConsoleLabelConfig>();
@@ -251,6 +279,23 @@ namespace GameScannerplusplus
                 model.Path = lines[line];
                 model.System = MapFolderToMedia(model.Path.Split('\\')[1]);
                 model.Folder = model.Path.Split('\\')[1];
+                string filename = model.Path.Split('\\').Last().Split('#').First();
+                string extension = filename.Split('.').Last();
+                string imageExtension = "png";
+
+                string imagePath = GameScannerPath + "Custom\\Labels\\" + model.Folder + "\\" + filename.Substring(0, filename.Length - extension.Length) + imageExtension;
+                string imagePathJpg = GameScannerPath + "Custom\\Labels\\" + model.Folder + "\\" + filename.Substring(0, filename.Length - extension.Length) + "jpg";
+
+                if (File.Exists(imagePathJpg))
+                {
+                    imagePath = imagePathJpg;
+                    imageExtension = "jpg";
+                }
+
+                string imagePathUnmodified = GameScannerPath + "Custom\\Carts\\" + model.Folder + "\\" + filename.Substring(0, filename.Length - extension.Length) + imageExtension;
+
+                model.CartImagePath = imagePathUnmodified;
+                model.LabelImagePath = imagePath;
 
                 line++;
 
@@ -276,9 +321,11 @@ namespace GameScannerplusplus
                 }
 
                 LoadingThingsDone = line;
+
+                Titles = new ObservableCollection<TitleModel>(Titles.OrderBy(x => x.System).ThenBy(y => y.Title));
             }
 
-            Debug.WriteLine(Titles);
+            
 
             EmuMovieProvider emuMovies = new EmuMovieProvider(UserName, PassWord);
 
@@ -325,11 +372,8 @@ namespace GameScannerplusplus
                 ct++;
                 LoadingThingsDone = ct;
                 DebugLog("Downloading " + ct + "/" + Titles.Where(t => !string.IsNullOrWhiteSpace(t.CartUrl)).Count());
-                string filename = titleModel.Path.Split('\\').Last().Split('#').First();
-                string extension = filename.Split('.').Last();
-                string imageExtension = titleModel.CartUrl.Split('.').Last();
-
-                string imagePathUnmodified = GameScannerPath + "Custom\\Carts\\" + titleModel.Folder + "\\" + filename.Substring(0, filename.Length - extension.Length) + imageExtension;
+                
+                string imagePathUnmodified = titleModel.CartImagePath;
 
                 DebugLog("Downloading " + titleModel.Title);
                 try
@@ -347,7 +391,6 @@ namespace GameScannerplusplus
                 catch
                 {
                 }
-
             }
 
             LoadingVisible = false;
@@ -396,15 +439,10 @@ namespace GameScannerplusplus
                 ct++;
                 LoadingThingsDone = ct;
                 DebugLog("Convertering " + ct + "/" + Titles.Where(t => !string.IsNullOrWhiteSpace(t.CartUrl)).Count());
-                string filename = titleModel.Path.Split('\\').Last().Split('#').First();
-                string extension = filename.Split('.').Last();
-                string imageExtension = titleModel.CartUrl.Split('.').Last();
+                
+                string imagePath = titleModel.LabelImagePath;
 
-                string imagePath = GameScannerPath + "Custom\\Labels\\" + titleModel.Folder + "\\" +
-                                   filename.Substring(0, filename.Length - extension.Length) + imageExtension;
-
-                string imagePathUnmodified = GameScannerPath + "Custom\\Carts\\" + titleModel.Folder + "\\" +
-                                             filename.Substring(0, filename.Length - extension.Length) + imageExtension;
+                string imagePathUnmodified = titleModel.CartImagePath;
 
                 if (File.Exists(imagePathUnmodified) && !File.Exists(imagePath))
                 {
@@ -427,7 +465,6 @@ namespace GameScannerplusplus
                             {
                                 new PointF(cfg.TemplateLabelSize.X,cfg.TemplateLabelSize.Y),
                                 new PointF(cfg.TemplateLabelSize.X+cfg.TemplateLabelSize.Width,cfg.TemplateLabelSize.Y),
-                                //new PointF(cfg.TemplateLabelSize.X+cfg.TemplateLabelSize.Width,cfg.TemplateLabelSize.Y+cfg.TemplateLabelSize.Height),
                                 new PointF(cfg.TemplateLabelSize.X,cfg.TemplateLabelSize.Y+cfg.TemplateLabelSize.Height)
                             });
 
@@ -498,13 +535,11 @@ namespace GameScannerplusplus
 
             public string EmuMoviesSystem { get; set; }
             public string EmuVRMedia { get; set; }
-            //  public List<string> FolderNames { get; set; } = new List<string>();
         }
 
         public class LabelSize : BaseViewModel
         {
             private int x, y, width, height;
-
             public int X { get => x; set => Set(ref x, value); }
             public int Y { get => y; set => Set(ref y, value); }
             public int Width { get => width; set => Set(ref width, value); }
